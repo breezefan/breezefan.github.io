@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BreezeFan – Stay Cool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+    }
+
+    header {
+      background: linear-gradient(135deg, #00cfd5, #4bd3ac);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #e6f7f8;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .product-grid img {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .product-info h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .product-info p {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #495057;
+    }
+
+    .price {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .color-selector {
+      margin-bottom: 1rem;
+    }
+
+    .color-button {
+      padding: 0.5rem 1rem;
+      margin-right: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .color-button.selected {
+      border-color: #00bcd4;
+      background-color: #e3f9fc;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: #00bcd4;
+      border: none;
+      color: white;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0195a3;
+    }
+
+    #cart {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #dee2e6;
+    }
+
+    #cart h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 2rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>BreezeFan</h1>
+    <p>Premium portable cooling. Anywhere. Anytime.</p>
+  </header>
+
+  <div class="container">
+    <div class="product-grid">
+      <img id="product-image" src="breezefanwhite.png" alt="BreezeFan" />
+      <div class="product-info">
+        <h2>BreezeFan</h2>
+        <p>The elegant and silent portable fan you can take anywhere. Whether you're at the beach, desk, or on the go – stay cool with style.</p>
+        <p class="price">$14.99</p>
+
+        <div class="color-selector">
+          <p><strong>Select Color:</strong></p>
+          <button class="color-button" onclick="selectColor('Pink')">Pink</button>
+          <button class="color-button" onclick="selectColor('Black')">Black</button>
+          <button class="color-button" onclick="selectColor('White')">White</button>
+        </div>
+
+        <button onclick="addToCart()">Add to Cart</button>
+      </div>
+    </div>
+
+    <div id="cart">
+      <h3>Your Cart</h3>
+      <div id="cart-items">No items in cart.</div>
+      <div id="cart-total"></div>
+      <div id="paypal-button-container" style="margin-top: 1rem;"></div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 BreezeFan. Crafted with coolness.
+  </footer>
+
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AVj_hVtkPk8ZYJaZ6ueapx-h0PZ1bAKQh1szhsHC7wrNwHdDgTQ4ajJDbioBe8BxlqU9keU41trrsXnysb&currency=USD"></script>
+
+  <script>
+    let cart = {
+      name: "BreezeFan",
+      price: 14.99,
+      quantity: 0,
+      color: null
+    };
+
+    function selectColor(color) {
+      cart.color = color;
+
+      document.querySelectorAll('.color-button').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.textContent === color) {
+          btn.classList.add('selected');
+        }
+      });
+
+      const img = document.getElementById("product-image");
+      if (color === "Pink") {
+        img.src = "breezefanpink.png";
+      } else if (color === "Black") {
+        img.src = "breezefan.png";
+      } else if (color === "White") {
+        img.src = "breezefanwhite.png";
+      }
+    }
+
+    function addToCart() {
+      if (!cart.color) {
+        alert("Please select a color before adding to cart.");
+        return;
+      }
+      cart.quantity = 1;
+      updateCart();
+    }
+
+    function updateCart() {
+      const items = document.getElementById('cart-items');
+      const total = document.getElementById('cart-total');
+      if (cart.quantity > 0) {
+        items.innerHTML = `${cart.quantity} x ${cart.name} (${cart.color}) - $${cart.price.toFixed(2)}`;
+        total.innerHTML = `<strong>Total: $${(cart.price * cart.quantity).toFixed(2)}</strong>`;
+        renderPayPalButton();
+      } else {
+        items.innerHTML = "No items in cart.";
+        total.innerHTML = "";
+        document.getElementById('paypal-button-container').innerHTML = "";
+      }
+    }
+
+    function renderPayPalButton() {
+      document.getElementById('paypal-button-container').innerHTML = "";
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: (cart.price * cart.quantity).toFixed(2)
+              },
+              description: `${cart.name} (${cart.color})`
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            alert('Thank you, ' + details.payer.name.given_name + '! Your order was successful.');
+          });
+        }
+      }).render('#paypal-button-container');
+    }
+  </script>
+
+</body>
+</html>
