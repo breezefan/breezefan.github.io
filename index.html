@@ -309,8 +309,32 @@
       font-style: italic;
     }
 
-    #paypal-button-container {
-      margin-top: 2rem;
+    .paypal-checkout-btn {
+      background: #0070ba;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+      width: 100%;
+      max-width: 300px;
+      margin-top: 1rem;
+    }
+
+    .paypal-checkout-btn:hover {
+      background: #005ea6;
+      transform: translateY(-2px);
+    }
+
+    .paypal-checkout-btn i {
+      font-size: 1.2rem;
     }
 
     footer {
@@ -417,7 +441,7 @@
           <img id="product-image" src="breezefanwhite.png" alt="BreezeFan" class="floating" />
         </div>
         <div class="product-info">
-          <h2>BreezeFan</h2>
+          <h2>BreezeFan Pro</h2>
           <p>The elegant and silent portable fan you can take anywhere. Whether you're at the beach, desk, or on the go – stay cool with style.</p>
           
           <div class="features">
@@ -461,7 +485,11 @@
       <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
       <div id="cart-items" class="empty-cart">No items in cart.</div>
       <div id="cart-total"></div>
-      <div id="paypal-button-container"></div>
+      <div id="checkout-section" style="display: none;">
+        <button id="paypal-checkout-btn" class="paypal-checkout-btn" onclick="redirectToPayPal()">
+          <i class="fab fa-paypal"></i> Checkout with PayPal
+        </button>
+      </div>
     </section>
   </div>
 
@@ -490,9 +518,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- PayPal SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AVj_hVtkPk8ZYJaZ6ueapx-h0PZ1bAKQh1szhsHC7wrNwHdDgTQ4ajJDbioBe8BxlqU9keU41trrsXnysb&currency=USD"></script>
 
   <script>
     // Initialize cart
@@ -548,6 +573,7 @@
     function updateCart() {
       const items = document.getElementById('cart-items');
       const total = document.getElementById('cart-total');
+      const checkoutSection = document.getElementById('checkout-section');
       
       if (cart.quantity > 0) {
         items.classList.remove('empty-cart');
@@ -561,44 +587,27 @@
           </div>
         `;
         total.innerHTML = `<strong>Total: $${(cart.price * cart.quantity).toFixed(2)}</strong>`;
-        renderPayPalButton();
+        checkoutSection.style.display = 'block';
       } else {
         items.classList.add('empty-cart');
         items.innerHTML = "No items in cart.";
         total.innerHTML = "";
-        document.getElementById('paypal-button-container').innerHTML = "";
+        checkoutSection.style.display = 'none';
       }
     }
 
-    // Render PayPal button
-    function renderPayPalButton() {
-      document.getElementById('paypal-button-container').innerHTML = "";
-      paypal.Buttons({
-        style: {
-          shape: 'pill',
-          color: 'blue',
-          layout: 'vertical',
-          label: 'checkout'
-        },
-        createOrder: function(data, actions) {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: (cart.price * cart.quantity).toFixed(2)
-              },
-              description: `${cart.name} (${cart.color})`
-            }]
-          });
-        },
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(function(details) {
-            showAlert(`Thank you, ${details.payer.name.given_name}! Your order was successful.`, "success");
-            // Reset cart after successful purchase
-            cart.quantity = 0;
-            updateCart();
-          });
-        }
-      }).render('#paypal-button-container');
+    // Redirect to PayPal
+    function redirectToPayPal() {
+      const amount = (cart.price * cart.quantity).toFixed(2);
+      const itemName = encodeURIComponent(`${cart.name} (${cart.color})`);
+      const businessEmail = "your-business@example.com"; // Replace with your PayPal email
+      const returnUrl = encodeURIComponent("https://yourwebsite.com/thank-you"); // Replace with your return URL
+      const cancelUrl = encodeURIComponent("https://yourwebsite.com/cancel"); // Replace with your cancel URL
+      
+      // PayPal hosted checkout URL with all parameters
+      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${businessEmail}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}&cancel_return=${cancelUrl}`;
+      
+      window.location.href = paypalUrl;
     }
 
     // Show alert message
